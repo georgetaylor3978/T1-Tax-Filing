@@ -47,6 +47,10 @@
                 <span class="tab-icon">🏥</span>
                 <span class="tab-label">Pensions & Benefits</span>
             </button>
+            <button class="tab-btn" data-tab="govexp">
+                <span class="tab-icon">&#127963;&#65039;</span>
+                <span class="tab-label">Gov't Expenses</span>
+            </button>
             <div class="tab-indicator" id="tabIndicator"></div>
         </div>
     </nav>
@@ -176,11 +180,113 @@
         </div>
     </section>
 
+    <!-- ═══════ TAB 3: GOV'T EXPENSES ═══════ -->
+    <section class="tab-section" id="section-govexp">
+        <div class="section-content">
+
+            <!-- Controls -->
+            <div class="gx-controls-bar">
+                <div class="gx-controls-row">
+
+                    <!-- Bracket Selector -->
+                    <div class="gx-control-group">
+                        <label class="gx-label">YOUR INCOME BRACKET</label>
+                        <select id="gx-bracketSelect" class="bracket-dropdown"></select>
+                    </div>
+
+                    <!-- Department Multi-Select -->
+                    <div class="gx-control-group gx-grow">
+                        <label class="gx-label">DEPARTMENT GROUP</label>
+                        <div class="gx-dropdown" id="gx-deptDropdown">
+                            <div class="gx-trigger" id="gx-deptTrigger">
+                                <span class="gx-trigger-label">Select departments…</span>
+                                <span class="dropdown-arrow"></span>
+                            </div>
+                            <div class="gx-menu" id="gx-deptMenu">
+                                <div class="gx-search-row">
+                                    <input type="text" id="gx-deptSearch" placeholder="Search…">
+                                </div>
+                                <div class="gx-quick-btns">
+                                    <button class="quick-btn" id="gx-selectAll">Select All</button>
+                                    <button class="quick-btn" id="gx-clearAll">Clear</button>
+                                </div>
+                                <div class="dropdown-list" id="gx-deptList"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data status -->
+                    <div class="gx-data-status gx-loaded" id="gx-dataStatus">⏳ Loading…</div>
+                </div>
+
+                <!-- Slicers Row -->
+                <div class="slicer-row">
+                    <div class="slicer-group">
+                        <label class="gx-label">EXPENSE TYPE (SOBJ)</label>
+                        <div class="slicer-buttons" id="gx-slicerArea"></div>
+                    </div>
+                    <div class="toggle-group">
+                        <label class="gx-label">Combine Types</label>
+                        <label class="switch">
+                            <input type="checkbox" id="gx-combineToggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="summary-cards">
+                <div class="card accent-cyan">
+                    <div class="card-label">Latest Year Spending</div>
+                    <div class="card-value" id="gx-kpi-latest">—</div>
+                    <div class="card-sub" id="gx-kpi-latest-sub">select departments above</div>
+                </div>
+                <div class="card accent-rose">
+                    <div class="card-label">10-Year Growth</div>
+                    <div class="card-value" id="gx-kpi-growth">—</div>
+                    <div class="card-sub" id="gx-kpi-growth-sub">Change over 10 years</div>
+                </div>
+                <div class="card accent-amber">
+                    <div class="card-label">Your Personal Cost</div>
+                    <div class="card-value" id="gx-kpi-yourcost">—</div>
+                    <div class="card-sub" id="gx-kpi-yourcost-sub">Your tax share of this spending</div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-container" style="margin-top:1rem">
+                <div class="chart-header">
+                    <h2 id="gx-chartTitle">Federal Spending Over Time</h2>
+                </div>
+                <div class="chart-empty-state" id="gx-emptyState">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M3 3v18h18" />
+                        <path d="M18 17V9" />
+                        <path d="M13 17V5" />
+                        <path d="M8 17v-3" />
+                    </svg>
+                    <p>Select one or more Department Groups to view expenses over time.</p>
+                    <div class="hint">Your bracket share will appear as a cyan line on the right axis.</div>
+                </div>
+                <div class="gx-chart-wrapper chart-wrapper">
+                    <canvas id="gx-chart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
     <footer class="footer">
-        <p>Data Source: Canada Revenue Agency — T1 Final Statistics (2023) | Population: Statistics Canada</p>
+        <p>Data Source: Canada Revenue Agency — T1 Final Statistics (2023) | Population: Statistics Canada | Open Canada
+            API — Federal Expenditures</p>
     </footer>
 
     <script src="app.js"></script>
+    <script src="govexp-data.js"
+        onerror="console.warn('govexp-data.js not found — run update-govexp-data.js')"></script>
+    <script src="govexp-app.js"></script>
 </body>
 
 </html>
