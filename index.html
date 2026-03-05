@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canadian T1 Tax Data — 2023 Income Bracket Explorer</title>
+    <meta name="description"
+        content="Explore 2023 Canadian T1 tax return data by income bracket. Compare your tax burden, see per-capita breakdowns, and review pension and benefit distributions.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                        <line x1="1" y1="10" x2="23" y2="10" />
+                    </svg>
+                </div>
+                <div>
+                    <h1><span class="canada-flag">&#x1F1E8;&#x1F1E6;</span> Canadian T1 Tax Data — 2023</h1>
+                    <div class="subtitle">Income Bracket Explorer · Tax Year 2023 · Amounts in Thousands</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="data-status loaded" id="dataStatus">&#x25CF; Data Loaded</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+        <div class="tab-bar-content">
+            <button class="tab-btn active" data-tab="bracket">
+                <span class="tab-icon">💰</span>
+                <span class="tab-label">Your Tax Bracket</span>
+            </button>
+            <button class="tab-btn" data-tab="benefits">
+                <span class="tab-icon">🏥</span>
+                <span class="tab-label">Pensions & Benefits</span>
+            </button>
+            <div class="tab-indicator" id="tabIndicator"></div>
+        </div>
+    </nav>
+
+    <!-- ═══════ TAB 1: YOUR TAX BRACKET ═══════ -->
+    <section class="tab-section active" id="section-bracket">
+        <div class="section-content">
+            <!-- Bracket Selector -->
+            <div class="bracket-selector">
+                <label>SELECT YOUR INCOME BRACKET</label>
+                <select id="bracketSelect" class="bracket-dropdown"></select>
+            </div>
+
+            <!-- KPI Cards (5 cards) -->
+            <div class="summary-cards cards-5">
+                <div class="card accent-cyan">
+                    <div class="card-label">Your Per-Capita Tax</div>
+                    <div class="card-value" id="kpi-your-tax">&mdash;</div>
+                    <div class="card-sub" id="kpi-your-tax-sub">&mdash;</div>
+                </div>
+                <div class="card accent-amber">
+                    <div class="card-value" id="kpi-avg-canadian">&mdash;</div>
+                    <div class="card-label">Avg Canadian (Population)</div>
+                    <div class="card-sub" id="kpi-avg-canadian-sub">&mdash;</div>
+                </div>
+                <div class="card accent-emerald">
+                    <div class="card-value" id="kpi-avg-filer">&mdash;</div>
+                    <div class="card-label">Avg Tax Filer</div>
+                    <div class="card-sub" id="kpi-avg-filer-sub">&mdash;</div>
+                </div>
+                <div class="card accent-violet">
+                    <div class="card-value" id="kpi-median-filer">&mdash;</div>
+                    <div class="card-label">Median Tax Filer</div>
+                    <div class="card-sub" id="kpi-median-filer-sub">&mdash;</div>
+                </div>
+                <div class="card accent-rose">
+                    <div class="card-label">You vs. Median Filer</div>
+                    <div class="card-value" id="kpi-share">&mdash;</div>
+                    <div class="card-sub" id="kpi-share-sub">&mdash;</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>Per-Capita Tax Payable by Bracket</h2>
+                    </div>
+                    <div class="chart-wrapper active">
+                        <canvas id="bracket-bar-chart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>Number of Tax Filers by Bracket</h2>
+                    </div>
+                    <div class="chart-wrapper active">
+                        <canvas id="filers-bar-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="data-table-container">
+                <div class="chart-header">
+                    <h2>Tax Data by Bracket</h2>
+                </div>
+                <div class="data-table-scroll" id="bracket-table"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ TAB 2: PENSIONS & BENEFITS ═══════ -->
+    <section class="tab-section" id="section-benefits">
+        <div class="section-content">
+            <!-- KPI Cards -->
+            <div class="summary-cards">
+                <div class="card accent-cyan">
+                    <div class="card-label">Total Pension & Benefit Pool</div>
+                    <div class="card-value" id="ben-pool">&mdash;</div>
+                    <div class="card-sub">Combined $ for all benefit types</div>
+                </div>
+                <div class="card accent-amber">
+                    <div class="card-label">% of Taxable Income</div>
+                    <div class="card-value" id="ben-pct">&mdash;</div>
+                    <div class="card-sub" id="ben-pct-sub">&mdash;</div>
+                </div>
+                <div class="card accent-emerald">
+                    <div class="card-label">Total Recipients</div>
+                    <div class="card-value" id="ben-recipients">&mdash;</div>
+                    <div class="card-sub">Across all benefit types</div>
+                </div>
+                <div class="card accent-rose">
+                    <div class="card-label">Per-Recipient Average</div>
+                    <div class="card-value" id="ben-avg">&mdash;</div>
+                    <div class="card-sub">Pool ÷ Recipients</div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="charts-grid charts-single">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>Pension & Benefit Amounts ($)</h2>
+                    </div>
+                    <div class="chart-wrapper active">
+                        <canvas id="benefits-chart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>Number of Recipients</h2>
+                    </div>
+                    <div class="chart-wrapper active">
+                        <canvas id="recipients-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits Table -->
+            <div class="data-table-container">
+                <div class="chart-header">
+                    <h2>Pension & Benefit Breakdown</h2>
+                </div>
+                <div class="data-table-scroll" id="benefits-table"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Data Source: Canada Revenue Agency — T1 Final Statistics (2023) | Population: Statistics Canada</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
