@@ -282,6 +282,13 @@ function gxSetupEvents() {
             gxUpdateChart();
         });
     }
+
+    // Default initialization: select 'All' departments
+    var chkAll = document.getElementById('gx-chk-all');
+    if (chkAll) {
+        chkAll.checked = true;
+        chkAll.dispatchEvent(new Event('change', { bubbles: true }));
+    }
 }
 
 function gxUpdateTriggerLabel() {
