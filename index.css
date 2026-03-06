@@ -149,6 +149,30 @@ body {
     background-clip: unset;
 }
 
+/* Hobo Logo */
+.hobo-link {
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.hobo-link:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
+}
+
+.hobo-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    transition: border-color 0.3s ease;
+}
+
+.hobo-link:hover .hobo-img {
+    border-color: #06b6d4;
+}
+
 /* ═══════════ Tab Bar ═══════════ */
 .tab-bar {
     background: var(--bg-secondary);

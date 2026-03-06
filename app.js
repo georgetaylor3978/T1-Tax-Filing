@@ -393,7 +393,7 @@ function updateTab2() {
         var amount = item.brackets.Total.amount * 1000;
         var count = item.brackets.Total.count;
         totalPool += amount;
-        totalRecipients += count;
+        if (count > totalRecipients) totalRecipients = count; // Requested: MAX of subcategories
         benefitData.push({
             label: bl.label,
             color: bl.color,
@@ -412,10 +412,18 @@ function updateTab2() {
     document.getElementById('ben-recipients').textContent = formatNum(totalRecipients);
     document.getElementById('ben-avg').textContent = formatDollars(totalRecipients > 0 ? totalPool / totalRecipients : 0);
 
+    // Total tax filers for % of recipients calculation
+    var line3 = DATA.lineItems[3];
+    var totalFilers = line3 ? line3.brackets.Total.count : 0;
+
+    // Sort data for charts (largest to smallest)
+    var sortedByAmount = benefitData.slice().sort(function (a, b) { return b.amount - a.amount; });
+    var sortedByCount = benefitData.slice().sort(function (a, b) { return b.count - a.count; });
+
     // Charts
-    updateBenefitsChart(benefitData);
-    updateRecipientsChart(benefitData);
-    updateBenefitsTable(benefitData, totalPool);
+    updateBenefitsChart(sortedByAmount);
+    updateRecipientsChart(sortedByCount);
+    updateBenefitsTable(benefitData, totalPool, totalFilers);
 }
 
 function updateBenefitsChart(benefitData) {
@@ -514,26 +522,33 @@ function updateRecipientsChart(benefitData) {
     });
 }
 
-function updateBenefitsTable(benefitData, totalPool) {
+function updateBenefitsTable(benefitData, totalPool, totalFilers) {
     var container = document.getElementById('benefits-table');
     var html = '<table class="data-table"><thead><tr>';
     html += '<th>Benefit Type</th><th>Total Amount ($)</th>';
-    html += '<th>Recipients</th><th>Per Recipient</th>';
+    html += '<th>% of Total Pool</th>';
+    html += '<th>Recipients</th><th>% of Total Filers</th><th>Per Recipient</th>';
     html += '</tr></thead><tbody>';
 
     benefitData.forEach(function (d) {
         html += '<tr>';
         html += '<td>' + d.label + '</td>';
         html += '<td>' + formatDollarsShort(d.amount) + '</td>';
+        var pctPool = totalPool > 0 ? (d.amount / totalPool) * 100 : 0;
+        html += '<td>' + pctPool.toFixed(1) + '%</td>';
         html += '<td>' + formatNum(d.count) + '</td>';
+        var pctFilers = totalFilers > 0 ? (d.count / totalFilers) * 100 : 0;
+        html += '<td>' + pctFilers.toFixed(1) + '%</td>';
         html += '<td>' + formatDollars(d.perRecipient) + '</td>';
         html += '</tr>';
     });
 
-    // Total row — only Total Amount (recipients are not cumulative, so omitted)
+    // Total row
     html += '<tr class="total-row">';
     html += '<td><strong>Total Pool</strong></td>';
     html += '<td><strong>' + formatDollarsShort(totalPool) + '</strong></td>';
+    html += '<td><strong>100%</strong></td>';
+    html += '<td>&mdash;</td>';
     html += '<td>&mdash;</td>';
     html += '<td>&mdash;</td>';
     html += '</tr>';

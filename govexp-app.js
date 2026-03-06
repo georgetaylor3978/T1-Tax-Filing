@@ -90,9 +90,16 @@ function gxComputeShareOfPool() {
     if (!window.DATA || !gx.selectedBracket) { gx.shareOfPool = 0; return; }
     var line106 = window.DATA.lineItems[106];
     if (!line106) { gx.shareOfPool = 0; return; }
-    var totalTax = line106.brackets.Total.amount;
-    var bracketTax = line106.brackets[gx.selectedBracket] ? line106.brackets[gx.selectedBracket].amount : 0;
-    gx.shareOfPool = totalTax > 0 ? bracketTax / totalTax : 0;
+
+    var totalTax = line106.brackets.Total.amount * 1000;
+    var bracketTax = line106.brackets[gx.selectedBracket] ? line106.brackets[gx.selectedBracket].amount * 1000 : 0;
+    var bracketFilers = line106.brackets[gx.selectedBracket] ? line106.brackets[gx.selectedBracket].count : 0;
+
+    // Per capita tax for the selected individual
+    var perCapitaTax = bracketFilers > 0 ? bracketTax / bracketFilers : 0;
+
+    // Individual's true proportional share of the entire tax pool
+    gx.shareOfPool = totalTax > 0 ? perCapitaTax / totalTax : 0;
 }
 
 // ── Department Multi-Select Dropdown ─────────────────────────
@@ -184,11 +191,33 @@ function gxSetupEvents() {
             var item = chk.closest('.gx-dd-item');
             var type = item.getAttribute('data-type');
             var id = Number(item.getAttribute('data-id'));
-            var key = type + ':' + id;
-            if (chk.checked) {
-                gx.selectedDepts.add(key);
+            if (type === 'all') {
+                var isChecked = chk.checked;
+                document.querySelectorAll('#gx-deptList .gx-chk').forEach(function (c) {
+                    c.checked = isChecked;
+                    var itm = c.closest('.gx-dd-item');
+                    var t = itm.getAttribute('data-type');
+                    var i = Number(itm.getAttribute('data-id'));
+                    if (t !== 'all') {
+                        if (isChecked) {
+                            gx.selectedDepts.add(t + ':' + i);
+                        } else {
+                            gx.selectedDepts.delete(t + ':' + i);
+                        }
+                    }
+                });
+                if (isChecked) gx.selectedDepts.add('all:-1');
+                else gx.selectedDepts.delete('all:-1');
             } else {
-                gx.selectedDepts.delete(key);
+                var key = type + ':' + id;
+                if (chk.checked) {
+                    gx.selectedDepts.add(key);
+                } else {
+                    gx.selectedDepts.delete(key);
+                    var master = document.getElementById('gx-chk-all');
+                    if (master) master.checked = false;
+                    gx.selectedDepts.delete('all:-1');
+                }
             }
             gxUpdateTriggerLabel();
             gxUpdateChart();
@@ -196,41 +225,33 @@ function gxSetupEvents() {
         });
     }
 
-    // Search
-    var search = document.getElementById('gx-deptSearch');
-    if (search) {
-        search.addEventListener('input', function (e) {
-            var term = e.target.value.toLowerCase();
-            document.querySelectorAll('#gx-deptList .gx-dd-item').forEach(function (item) {
-                var label = item.querySelector('label');
-                var text = label ? label.textContent.toLowerCase() : '';
-                item.style.display = text.includes(term) ? 'flex' : 'none';
-            });
-        });
-    }
-
-    // Select All / Clear
-    var selectAll = document.getElementById('gx-selectAll');
+    // Clear All (Dept)
     var clearAll = document.getElementById('gx-clearAll');
-    if (selectAll) {
-        selectAll.addEventListener('click', function () {
-            document.querySelectorAll('#gx-deptList .gx-chk').forEach(function (chk) {
-                chk.checked = true;
-                var item = chk.closest('.gx-dd-item');
-                var type = item.getAttribute('data-type');
-                var id = Number(item.getAttribute('data-id'));
-                gx.selectedDepts.add(type + ':' + id);
-            });
-            gxUpdateTriggerLabel();
-            gxUpdateChart();
-            gxUpdateCards();
-        });
-    }
     if (clearAll) {
         clearAll.addEventListener('click', function () {
             document.querySelectorAll('#gx-deptList .gx-chk').forEach(function (chk) { chk.checked = false; });
             gx.selectedDepts.clear();
             gxUpdateTriggerLabel();
+            gxUpdateChart();
+            gxUpdateCards();
+        });
+    }
+
+    // Slicer Select All / Clear
+    var slicerAll = document.getElementById('gx-slicerSelectAll');
+    var slicerClear = document.getElementById('gx-slicerClear');
+    if (slicerAll) {
+        slicerAll.addEventListener('click', function () {
+            gx.data.slicerCats.forEach(function (_, i) { gx.selectedSlicers.add(i); });
+            document.querySelectorAll('.slicer-btn').forEach(function (b) { b.classList.add('active'); });
+            gxUpdateChart();
+            gxUpdateCards();
+        });
+    }
+    if (slicerClear) {
+        slicerClear.addEventListener('click', function () {
+            gx.selectedSlicers.clear();
+            document.querySelectorAll('.slicer-btn').forEach(function (b) { b.classList.remove('active'); });
             gxUpdateChart();
             gxUpdateCards();
         });
@@ -464,18 +485,20 @@ function gxUpdateCards() {
     document.getElementById('gx-kpi-latest').textContent = gxFmt(latestAmt);
     document.getElementById('gx-kpi-latest-sub').textContent = 'FY ' + latestYear + '-' + String(latestYear + 1).slice(-2);
 
-    // Card 2: 10-yr growth
-    var tenYrYIdx = sortedYIdxs.find(function (i) { return gx.data.years[i] === latestYear - 10; });
+    // Card 2: New Debt (Your Share)
+    var debtIdx = gx.data.slicerCats.indexOf('Public debt charges');
     var growthEl = document.getElementById('gx-kpi-growth');
-    if (tenYrYIdx !== undefined && combined[tenYrYIdx].total > 0) {
-        var growth = ((latestAmt - combined[tenYrYIdx].total) / combined[tenYrYIdx].total) * 100;
-        growthEl.textContent = (growth >= 0 ? '+' : '') + growth.toFixed(1) + '%';
-        growthEl.style.color = growth >= 0 ? '#f43f5e' : '#10b981'; // red = spending rise, green = decrease
-        document.getElementById('gx-kpi-growth-sub').textContent = 'Change over 10 years';
+    var subEl = document.getElementById('gx-kpi-growth-sub');
+    if (debtIdx >= 0 && combined[latestYIdx] && combined[latestYIdx].bySlicer[debtIdx] > 0) {
+        var debtTarget = combined[latestYIdx].bySlicer[debtIdx];
+        var debtShare = debtTarget * gx.shareOfPool;
+        growthEl.textContent = gxFmt(debtShare);
+        subEl.textContent = 'You borrowed an additional ' + gxFmt(debtShare) + ' in the most recent year';
+        growthEl.style.color = '#f43f5e';
     } else {
-        growthEl.textContent = 'N/A';
+        growthEl.textContent = '—';
         growthEl.style.color = '';
-        document.getElementById('gx-kpi-growth-sub').textContent = '10 years of data not available';
+        subEl.textContent = 'No debt data for selection';
     }
 
     // Card 3: Your cost

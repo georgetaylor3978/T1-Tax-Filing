@@ -31,6 +31,10 @@
                 </div>
             </div>
             <div class="header-actions">
+                <a href="https://www.youtube.com/watch?v=S6HEH23W_bM" target="_blank" class="hobo-link"
+                    title="The Littlest Hobo">
+                    <img src="littlehobo.jpg" alt="Hobo" class="hobo-img">
+                </a>
                 <div class="data-status loaded" id="dataStatus">&#x25CF; Data Loaded</div>
             </div>
         </div>
@@ -126,6 +130,15 @@
     <!-- ═══════ TAB 2: PENSIONS & BENEFITS ═══════ -->
     <section class="tab-section" id="section-benefits">
         <div class="section-content">
+            <div
+                style="margin-bottom: 24px; padding: 14px 18px; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: var(--radius-sm); border-left: 4px solid var(--accent-blue);">
+                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin: 0;">
+                    <strong style="color: var(--text-primary);">T1 Pension Incomes (CRA Data):</strong> This tab
+                    displays T1 pension incomes per CRA data files. Certain values may be estimated and do not reflect
+                    all individual scenarios.
+                </p>
+            </div>
+
             <!-- KPI Cards -->
             <div class="summary-cards">
                 <div class="card accent-cyan">
@@ -203,11 +216,8 @@
                                 <span class="dropdown-arrow"></span>
                             </div>
                             <div class="gx-menu" id="gx-deptMenu">
-                                <div class="gx-search-row">
-                                    <input type="text" id="gx-deptSearch" placeholder="Search…">
-                                </div>
-                                <div class="gx-quick-btns">
-                                    <button class="quick-btn" id="gx-selectAll">Select All</button>
+                                <div class="dropdown-options"
+                                    style="border-bottom: 1px solid var(--border-light); padding: 8px 12px; display: flex; justify-content: flex-end;">
                                     <button class="quick-btn" id="gx-clearAll">Clear</button>
                                 </div>
                                 <div class="dropdown-list" id="gx-deptList"></div>
@@ -222,8 +232,14 @@
                 <!-- Slicers Row -->
                 <div class="slicer-row">
                     <div class="slicer-group">
-                        <label class="gx-label">EXPENSE TYPE (SOBJ)</label>
-                        <div class="slicer-buttons" id="gx-slicerArea"></div>
+                        <label class="gx-label">Expense Type (SOBJ)</label>
+                        <div class="slicer-buttons" id="gx-slicerArea">
+                            <!-- Generated slicers go here -->
+                        </div>
+                        <div style="margin-top: 8px; display: flex; gap: 8px;">
+                            <button class="quick-btn" id="gx-slicerSelectAll">Select All</button>
+                            <button class="quick-btn" id="gx-slicerClear">None</button>
+                        </div>
                     </div>
                     <div class="toggle-group">
                         <label class="gx-label">Combine Types</label>
@@ -243,9 +259,9 @@
                     <div class="card-sub" id="gx-kpi-latest-sub">select departments above</div>
                 </div>
                 <div class="card accent-rose">
-                    <div class="card-label">10-Year Growth</div>
+                    <div class="card-label">New Debt (Your Share)</div>
                     <div class="card-value" id="gx-kpi-growth">—</div>
-                    <div class="card-sub" id="gx-kpi-growth-sub">Change over 10 years</div>
+                    <div class="card-sub" id="gx-kpi-growth-sub">You borrowed an additional...</div>
                 </div>
                 <div class="card accent-amber">
                     <div class="card-label">Your Personal Cost</div>
@@ -281,6 +297,9 @@
     <footer class="footer">
         <p>Data Source: Canada Revenue Agency — T1 Final Statistics (2023) | Population: Statistics Canada | Open Canada
             API — Federal Expenditures</p>
+        <p style="margin-top: 8px; opacity: 0.8; font-style: italic;">All calculations are based on the most recent
+            available data from the Government of Canada. Estimates of Share of Expenses are based on using a
+            proportionate share of income tax.</p>
     </footer>
 
     <script src="app.js"></script>
