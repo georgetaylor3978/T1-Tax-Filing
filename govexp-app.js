@@ -21,7 +21,8 @@ var gx = {
     selectedSlicers: new Set(),
     isCombineOn: true,
     selectedBracket: null,
-    shareOfPool: 0              // fraction 0-1 from T1 data
+    selectedBracket: null,
+    perCapitaTax: 0              // exact $ amount selected bracket pays per capita
 };
 
 // Colors
@@ -87,19 +88,15 @@ function gxBuildBracketSelector() {
 }
 
 function gxComputeShareOfPool() {
-    if (!window.DATA || !gx.selectedBracket) { gx.shareOfPool = 0; return; }
+    if (!window.DATA || !gx.selectedBracket) { gx.perCapitaTax = 0; return; }
     var line106 = window.DATA.lineItems[106];
-    if (!line106) { gx.shareOfPool = 0; return; }
+    if (!line106) { gx.perCapitaTax = 0; return; }
 
-    var totalTax = line106.brackets.Total.amount * 1000;
     var bracketTax = line106.brackets[gx.selectedBracket] ? line106.brackets[gx.selectedBracket].amount * 1000 : 0;
     var bracketFilers = line106.brackets[gx.selectedBracket] ? line106.brackets[gx.selectedBracket].count : 0;
 
     // Per capita tax for the selected individual
-    var perCapitaTax = bracketFilers > 0 ? bracketTax / bracketFilers : 0;
-
-    // Individual's true proportional share of the entire tax pool
-    gx.shareOfPool = totalTax > 0 ? perCapitaTax / totalTax : 0;
+    gx.perCapitaTax = bracketFilers > 0 ? bracketTax / bracketFilers : 0;
 }
 
 // ── Department Multi-Select Dropdown ─────────────────────────
@@ -294,6 +291,17 @@ function gxUpdateTriggerLabel() {
 }
 
 // ── Data Aggregation ─────────────────────────────────────────
+function gxGetTotalFed(yIdx) {
+    if (gx._totalFedByYear && gx._totalFedByYear[yIdx]) return gx._totalFedByYear[yIdx];
+    if (!gx._totalFedByYear) gx._totalFedByYear = {};
+    var total = 0;
+    for (var i = 0; i < gx.data.data.length; i++) {
+        if (gx.data.data[i][0] === yIdx) total += gx.data.data[i][4];
+    }
+    gx._totalFedByYear[yIdx] = total;
+    return total;
+}
+
 function gxGetSeriesData(type, id) {
     var result = {};
     for (var i = 0; i < gx.data.data.length; i++) {
@@ -408,7 +416,8 @@ function gxUpdateChart() {
     var sharePts = sortedYears.map(function (yr) {
         var yIdx = gx.data.years.indexOf(yr);
         var total = (combined[yIdx]) ? combined[yIdx].total : 0;
-        return total * gx.shareOfPool;
+        var fedTotal = gxGetTotalFed(yIdx) || 1;
+        return gx.perCapitaTax * (total / fedTotal);
     });
     datasets.push({
         type: 'line',
@@ -489,9 +498,10 @@ function gxUpdateCards() {
     var debtIdx = gx.data.slicerCats.indexOf('Public debt charges');
     var growthEl = document.getElementById('gx-kpi-growth');
     var subEl = document.getElementById('gx-kpi-growth-sub');
+    var fedTotal = gxGetTotalFed(latestYIdx) || 1;
     if (debtIdx >= 0 && combined[latestYIdx] && combined[latestYIdx].bySlicer[debtIdx] > 0) {
         var debtTarget = combined[latestYIdx].bySlicer[debtIdx];
-        var debtShare = debtTarget * gx.shareOfPool;
+        var debtShare = gx.perCapitaTax * (debtTarget / fedTotal);
         growthEl.textContent = gxFmt(debtShare);
         subEl.textContent = 'You borrowed an additional ' + gxFmt(debtShare) + ' in the most recent year';
         growthEl.style.color = '#f43f5e';
@@ -502,7 +512,7 @@ function gxUpdateCards() {
     }
 
     // Card 3: Your cost
-    var yourCost = latestAmt * gx.shareOfPool;
+    var yourCost = gx.perCapitaTax * (latestAmt / fedTotal);
     document.getElementById('gx-kpi-yourcost').textContent = gxFmt(yourCost);
     document.getElementById('gx-kpi-yourcost-sub').textContent =
         (gx.selectedBracket || '—') + ' bracket · FY ' + latestYear;
