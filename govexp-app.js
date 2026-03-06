@@ -483,6 +483,8 @@ function gxUpdateCards() {
         document.getElementById('gx-kpi-growth-sub').textContent = '—';
         document.getElementById('gx-kpi-yourcost').textContent = '—';
         document.getElementById('gx-kpi-yourcost-sub').textContent = '—';
+        document.getElementById('gx-kpi-debtbal').textContent = '—';
+        document.getElementById('gx-kpi-debtbal-sub').textContent = '—';
         return;
     }
 
@@ -516,6 +518,19 @@ function gxUpdateCards() {
     document.getElementById('gx-kpi-yourcost').textContent = gxFmt(yourCost);
     document.getElementById('gx-kpi-yourcost-sub').textContent =
         (gx.selectedBracket || '—') + ' bracket · FY ' + latestYear;
+
+    // Card 4: Outstanding Debt Balance (Your Share)
+    var debtBalEl = document.getElementById('gx-kpi-debtbal');
+    var debtBalSub = document.getElementById('gx-kpi-debtbal-sub');
+    if (gx.data.debtBalanceByYear && gx.data.debtBalanceByYear[latestYear]) {
+        var totalDebtBal = gx.data.debtBalanceByYear[latestYear];
+        var debtBalShare = gx.perCapitaTax * (totalDebtBal / fedTotal);
+        debtBalEl.textContent = gxFmt(debtBalShare);
+        debtBalSub.textContent = 'Cumulative share of ' + gxFmt(totalDebtBal) + ' national debt';
+    } else {
+        debtBalEl.textContent = '—';
+        debtBalSub.textContent = 'Data not available for ' + latestYear;
+    }
 }
 
 // ── Start when pane becomes visible ──────────────────────────

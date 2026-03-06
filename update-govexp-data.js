@@ -162,6 +162,7 @@ function httpsGet(url) {
         children,
         slicerCats: sortedSlicers,
         data,
+        debtBalanceByYear: {}, // Will populate below
         meta: {
             generatedAt: new Date().toISOString(),
             totalRecords: records.length,
@@ -169,6 +170,32 @@ function httpsGet(url) {
             unmappedOrgs: Array.from(unmapped).sort()
         }
     };
+
+    // ── Step 3.5: Extract Debt Balance from 10 Year Gov data ──
+    const debtBalances = {};
+    const tyGovDataPath = path.join(__dirname, '../10 Year Gov/data.json');
+    if (fs.existsSync(tyGovDataPath)) {
+        try {
+            const tyGovData = JSON.parse(fs.readFileSync(tyGovDataPath, 'utf8'));
+            if (tyGovData && tyGovData.balanceSheet) {
+                // Find Unmatured debt (total or sum up sub-categories)
+                const unmaturedItems = tyGovData.balanceSheet.filter(i => i.lvl3 === 'Unmatured debt');
+                unmaturedItems.forEach(item => {
+                    Object.entries(item.values).forEach(([fyStr, val]) => {
+                        const yr = parseInt(fyStr.split('/')[0], 10);
+                        if (!debtBalances[yr]) debtBalances[yr] = 0;
+                        debtBalances[yr] += (val * 1000000); // 10 Year Gov is in millions
+                    });
+                });
+            }
+        } catch (e) {
+            console.warn('⚠️ Warning: Could not parse 10 Year Gov data.json for debt balances.');
+        }
+    } else {
+        console.warn('⚠️ Warning: 10 Year Gov data.json not found. Debt KPI will be empty.');
+    }
+    output.debtBalanceByYear = debtBalances;
+    console.log(`   ✅ Extracted debt balances for ${Object.keys(debtBalances).length} years`);
 
     // ── Step 4: Write govexp-data.js ──────────────────────────
     const json = JSON.stringify(output);
