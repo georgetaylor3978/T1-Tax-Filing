@@ -613,6 +613,157 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════
+   SLICER BUTTONS, TOGGLES & QUICK ACTIONS
+   (shared by Tab 3 Gov't Expenses)
+   ═══════════════════════════════════════════════════════ */
+
+/* Quick action buttons (Select All / Clear) */
+.quick-btn {
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.quick-btn:hover {
+    color: white;
+    border-color: #f43f5e;
+    background: rgba(244, 63, 94, 0.1);
+}
+
+/* Slicer layout */
+.slicer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.slicer-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.slicer-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Slicer pill buttons */
+.slicer-btn {
+    padding: 7px 13px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.slicer-btn:hover {
+    color: var(--text-primary);
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.slicer-btn.active {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.slicer-color-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.slicer-btn.active .slicer-color-indicator {
+    opacity: 1;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Toggle switch */
+.toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    transition: 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: var(--text-secondary);
+    transition: 0.3s;
+}
+
+input:checked+.slider {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-color: transparent;
+}
+
+input:checked+.slider:before {
+    background: white;
+    transform: translateX(22px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.slider.round {
+    border-radius: 26px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* ═══════════════════════════════════════════════════════
+
    GOV'T EXPENSES TAB (Tab 3) — gx- scoped styles
    ═══════════════════════════════════════════════════════ */
 
