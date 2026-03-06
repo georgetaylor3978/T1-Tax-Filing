@@ -159,6 +159,18 @@ function updateTab1() {
     vsMedianEl.className = 'card-value ' + (vsMedian >= 1 ? (vsMedian > 1.5 ? 'negative' : '') : 'positive');
     document.getElementById('kpi-share-sub').textContent = formatDollars(myPerCapita) + ' vs ' + formatDollars(medianPerCapita) + ' median';
 
+    // Top Earner Stat (Top 2 Brackets)
+    var top2Brackets = brackets.slice(-2);
+    var top2Filers = 0;
+    var top2Tax = 0;
+    top2Brackets.forEach(function (b) {
+        top2Filers += line106.brackets[b].count;
+        top2Tax += line106.brackets[b].amount * 1000;
+    });
+    var pctPop = (top2Filers / population) * 100;
+    var pctTax = (top2Tax / totalTax) * 100;
+    document.getElementById('top-earner-stat').textContent = 'The top ' + pctPop.toFixed(1) + '% pay ' + pctTax.toFixed(1) + '% of all personal tax';
+
     // Charts
     updateBracketBarChart(line106, brackets, perCapitaByBracket);
     updateFilersBarChart(line106, brackets, perCapitaByBracket);
