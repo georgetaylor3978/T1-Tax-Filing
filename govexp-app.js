@@ -420,11 +420,15 @@ function gxUpdateChart() {
     }
 
     // Right axis: "Your Share" line
+    // Use the latest year's proportion for all years to maintain shape exactly like the bars
+    var latestYIdxChart = gx.data.years.indexOf(sortedYears[sortedYears.length - 1]);
+    var fedTotalLatest = gxGetTotalFed(latestYIdxChart) || 1;
+    var fixedRatio = gx.perCapitaTax / fedTotalLatest;
+
     var sharePts = sortedYears.map(function (yr) {
         var yIdx = gx.data.years.indexOf(yr);
         var total = (combined[yIdx]) ? combined[yIdx].total : 0;
-        var fedTotal = gxGetTotalFed(yIdx) || 1;
-        return gx.perCapitaTax * (total / fedTotal);
+        return total * fixedRatio;
     });
     datasets.push({
         type: 'line',
