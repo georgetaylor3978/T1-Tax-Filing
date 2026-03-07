@@ -455,7 +455,8 @@ function gxUpdateChart() {
             type: 'linear', position: 'right',
             title: { display: true, text: 'Your Share ($)', color: GX_LINE_COLOR },
             ticks: { color: GX_LINE_COLOR, callback: function (v) { return gxFmt(v); } },
-            grid: { drawOnChartArea: false }
+            grid: { drawOnChartArea: false },
+            beginAtZero: true
         }
     };
 
