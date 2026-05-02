@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -35,32 +35,23 @@
                     title="The Littlest Hobo">
                     <img src="littlehobo.jpg" alt="Hobo" class="hobo-img">
                 </a>
+                <!-- Dark/Light Mode Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode" aria-label="Toggle theme">
+                    <span class="theme-icon theme-icon-dark">🌙</span>
+                    <span class="theme-icon theme-icon-light">☀️</span>
+                </button>
                 <div class="data-status loaded" id="dataStatus">&#x25CF; Data Loaded</div>
             </div>
         </div>
     </header>
 
-    <!-- Tab Bar -->
-    <nav class="tab-bar">
-        <div class="tab-bar-content">
-            <button class="tab-btn active" data-tab="bracket">
-                <span class="tab-icon">💰</span>
-                <span class="tab-label">Your Tax Bracket</span>
-            </button>
-            <button class="tab-btn" data-tab="govexp">
-                <span class="tab-icon">&#127963;&#65039;</span>
-                <span class="tab-label">Gov't Expenses</span>
-            </button>
-            <button class="tab-btn" data-tab="benefits">
-                <span class="tab-icon">🏥</span>
-                <span class="tab-label">Pensions & Benefits</span>
-            </button>
-            <div class="tab-indicator" id="tabIndicator"></div>
+    <!-- ═══════ SECTION 1: WHO PAYS THE TAX ═══════ -->
+    <section class="page-section" id="section-bracket">
+        <div class="section-heading-bar">
+            <div class="section-content-inner">
+                <h2 class="section-title"><span class="section-icon">💰</span> WHO PAYS THE TAX</h2>
+            </div>
         </div>
-    </nav>
-
-    <!-- ═══════ TAB 1: YOUR TAX BRACKET ═══════ -->
-    <section class="tab-section active" id="section-bracket">
         <div class="section-content">
             <!-- Bracket Selector -->
             <div class="bracket-selector">
@@ -68,32 +59,32 @@
                 <select id="bracketSelect" class="bracket-dropdown"></select>
             </div>
 
-            <!-- KPI Cards (5 cards) -->
-            <div class="summary-cards cards-5">
-                <div class="card accent-cyan">
-                    <div class="card-label">Your Per-Capita Tax</div>
-                    <div class="card-value" id="kpi-your-tax">&mdash;</div>
-                    <div class="card-sub" id="kpi-your-tax-sub">&mdash;</div>
+            <!-- KPI Cards — merged line-by-line -->
+            <div class="summary-cards-list" id="bracket-kpi-list">
+                <div class="kpi-row">
+                    <div class="kpi-label accent-cyan-label">YOUR SHARE</div>
+                    <div class="kpi-value kpi-red" id="kpi-your-tax">—</div>
+                    <div class="kpi-sub" id="kpi-your-tax-sub">—</div>
                 </div>
-                <div class="card accent-amber">
-                    <div class="card-value" id="kpi-avg-canadian">&mdash;</div>
-                    <div class="card-label">Avg Canadian (Population)</div>
-                    <div class="card-sub" id="kpi-avg-canadian-sub">&mdash;</div>
+                <div class="kpi-row">
+                    <div class="kpi-label">AVERAGE CANADIAN</div>
+                    <div class="kpi-value" id="kpi-avg-canadian">—</div>
+                    <div class="kpi-sub" id="kpi-avg-canadian-sub">—</div>
                 </div>
-                <div class="card accent-emerald">
-                    <div class="card-value" id="kpi-avg-filer">&mdash;</div>
-                    <div class="card-label">Avg Tax Filer</div>
-                    <div class="card-sub" id="kpi-avg-filer-sub">&mdash;</div>
+                <div class="kpi-row">
+                    <div class="kpi-label">AVG TAX FILER</div>
+                    <div class="kpi-value" id="kpi-avg-filer">—</div>
+                    <div class="kpi-sub" id="kpi-avg-filer-sub">—</div>
                 </div>
-                <div class="card accent-violet">
-                    <div class="card-value" id="kpi-median-filer">&mdash;</div>
-                    <div class="card-label">Median Tax Filer</div>
-                    <div class="card-sub" id="kpi-median-filer-sub">&mdash;</div>
+                <div class="kpi-row">
+                    <div class="kpi-label">MEDIAN TAX FILER</div>
+                    <div class="kpi-value" id="kpi-median-filer">—</div>
+                    <div class="kpi-sub" id="kpi-median-filer-sub">—</div>
                 </div>
-                <div class="card accent-rose">
-                    <div class="card-label">You vs. Median Filer</div>
-                    <div class="card-value" id="kpi-share">&mdash;</div>
-                    <div class="card-sub" id="kpi-share-sub">&mdash;</div>
+                <div class="kpi-row">
+                    <div class="kpi-label">YOU vs. MEDIAN FILER</div>
+                    <div class="kpi-value" id="kpi-share">—</div>
+                    <div class="kpi-sub" id="kpi-share-sub">—</div>
                 </div>
             </div>
 
@@ -101,103 +92,36 @@
             <div class="charts-grid">
                 <div class="chart-container">
                     <div class="chart-header">
-                        <h2>Per-Capita Tax Payable by Bracket</h2>
-                        <div id="top-earner-stat"
-                            style="font-size: 0.95rem; padding: 5px 12px; background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.35); border-radius: 6px; color: var(--accent-cyan); font-weight: 600; white-space: nowrap; margin-left: 12px;">
-                        </div>
+                        <h2>PER-CAPITA TAX PAYABLE BY BRACKET — CANADA</h2>
                     </div>
                     <div class="chart-wrapper active">
                         <canvas id="bracket-bar-chart"></canvas>
                     </div>
+                    <div class="chart-source">T1 Final Statistics (2023) | Population: Statistics Canada</div>
                 </div>
                 <div class="chart-container">
                     <div class="chart-header">
-                        <h2>Number of Tax Filers by Bracket</h2>
+                        <h2>FEDERAL PERSONAL INCOME TAX — CANADA</h2>
+                        <div id="top-earner-stat"
+                            style="font-size: 0.88rem; padding: 5px 12px; background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.35); border-radius: 6px; color: #f43f5e; font-weight: 600; white-space: nowrap; margin-left: 12px;">
+                        </div>
                     </div>
                     <div class="chart-wrapper active">
                         <canvas id="filers-bar-chart"></canvas>
                     </div>
+                    <div class="chart-source">T1 Final Statistics (2023) | Population: Statistics Canada</div>
                 </div>
-            </div>
-
-            <!-- Data Table -->
-            <div class="data-table-container">
-                <div class="chart-header">
-                    <h2>Tax Data by Bracket</h2>
-                </div>
-                <div class="data-table-scroll" id="bracket-table"></div>
             </div>
         </div>
     </section>
 
-    <!-- ═══════ TAB 2: PENSIONS & BENEFITS ═══════ -->
-    <section class="tab-section" id="section-benefits">
-        <div class="section-content">
-            <div
-                style="margin-bottom: 24px; padding: 14px 18px; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: var(--radius-sm); border-left: 4px solid var(--accent-blue);">
-                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin: 0;">
-                    <strong style="color: var(--text-primary);">T1 Pension Incomes (CRA Data):</strong> This tab
-                    displays T1 pension incomes per CRA data files. Certain values may be estimated and do not reflect
-                    all individual scenarios.
-                </p>
-            </div>
-
-            <!-- KPI Cards -->
-            <div class="summary-cards">
-                <div class="card accent-cyan">
-                    <div class="card-label">Total Pension & Benefit Pool</div>
-                    <div class="card-value" id="ben-pool">&mdash;</div>
-                    <div class="card-sub">Combined $ for all benefit types</div>
-                </div>
-                <div class="card accent-amber">
-                    <div class="card-label">% of Taxable Income</div>
-                    <div class="card-value" id="ben-pct">&mdash;</div>
-                    <div class="card-sub" id="ben-pct-sub">&mdash;</div>
-                </div>
-                <div class="card accent-emerald">
-                    <div class="card-label">Total Recipients</div>
-                    <div class="card-value" id="ben-recipients">&mdash;</div>
-                    <div class="card-sub">Across all benefit types</div>
-                </div>
-                <div class="card accent-rose">
-                    <div class="card-label">Per-Recipient Average</div>
-                    <div class="card-value" id="ben-avg">&mdash;</div>
-                    <div class="card-sub">Pool ÷ Recipients</div>
-                </div>
-            </div>
-
-            <!-- Chart -->
-            <div class="charts-grid charts-single">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h2>Pension & Benefit Amounts ($)</h2>
-                    </div>
-                    <div class="chart-wrapper active">
-                        <canvas id="benefits-chart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h2>Number of Recipients</h2>
-                    </div>
-                    <div class="chart-wrapper active">
-                        <canvas id="recipients-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Benefits Table -->
-            <div class="data-table-container">
-                <div class="chart-header">
-                    <h2>Pension & Benefit Breakdown</h2>
-                </div>
-                <div class="data-table-scroll" id="benefits-table"></div>
+    <!-- ═══════ SECTION 2: HOW IT'S SPENT ═══════ -->
+    <section class="page-section" id="section-govexp">
+        <div class="section-heading-bar">
+            <div class="section-content-inner">
+                <h2 class="section-title"><span class="section-icon">🏛️</span> HOW IT'S SPENT</h2>
             </div>
         </div>
-    </section>
-
-    <!-- ═══════ TAB 3: GOV'T EXPENSES ═══════ -->
-    <section class="tab-section" id="section-govexp">
         <div class="section-content">
 
             <!-- Controls -->
@@ -228,60 +152,77 @@
                         </div>
                     </div>
 
-                    <!-- Data status -->
-                    <div class="gx-data-status gx-loaded" id="gx-dataStatus">⏳ Loading…</div>
-                </div>
-
-                <!-- Slicers Row -->
-                <div class="slicer-row">
-                    <div class="slicer-group">
-                        <label class="gx-label">Expense Type (SOBJ)</label>
-                        <div class="slicer-buttons" id="gx-slicerArea">
-                            <!-- Generated slicers go here -->
-                        </div>
-                        <div style="margin-top: 8px; display: flex; gap: 8px;">
-                            <button class="quick-btn" id="gx-slicerSelectAll">Select All</button>
-                            <button class="quick-btn" id="gx-slicerClear">None</button>
+                    <!-- SOBJ Expense Type Dropdown -->
+                    <div class="gx-control-group">
+                        <label class="gx-label">EXPENSE TYPE (SOBJ)</label>
+                        <div class="gx-dropdown" id="gx-slicerDropdown">
+                            <div class="gx-trigger" id="gx-slicerTrigger">
+                                <span class="gx-trigger-label">All types selected</span>
+                                <span class="dropdown-arrow"></span>
+                            </div>
+                            <div class="gx-menu" id="gx-slicerMenu">
+                                <div class="dropdown-options"
+                                    style="border-bottom: 1px solid var(--border-light); padding: 8px 12px; display: flex; gap: 8px;">
+                                    <button class="quick-btn" id="gx-slicerSelectAll">Select All</button>
+                                    <button class="quick-btn" id="gx-slicerClear">None</button>
+                                </div>
+                                <div class="dropdown-list" id="gx-slicerList"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="toggle-group">
-                        <label class="gx-label">Combine Types</label>
+
+                    <!-- Combine Toggle -->
+                    <div class="gx-control-group" style="align-items:center; flex-direction:row; gap:10px; min-width:auto;">
+                        <label class="gx-label" style="white-space:nowrap;">COMBINE TYPES</label>
                         <label class="switch">
                             <input type="checkbox" id="gx-combineToggle" checked>
                             <span class="slider round"></span>
                         </label>
                     </div>
+
+                    <!-- Data status -->
+                    <div class="gx-data-status gx-loaded" id="gx-dataStatus">⏳ Loading…</div>
                 </div>
             </div>
 
-            <!-- KPI Cards -->
-            <div class="summary-cards">
-                <div class="card accent-cyan">
-                    <div class="card-label">Latest Year Spending</div>
-                    <div class="card-value" id="gx-kpi-latest">—</div>
-                    <div class="card-sub" id="gx-kpi-latest-sub">select departments above</div>
+            <!-- KPI Cards — merged list style -->
+            <div class="summary-cards-list" id="govexp-kpi-list">
+                <div class="kpi-row">
+                    <div class="kpi-label accent-cyan-label">TOTAL SPENDING</div>
+                    <div class="kpi-value" id="gx-kpi-latest">—</div>
+                    <div class="kpi-sub" id="gx-kpi-latest-sub">select departments above</div>
                 </div>
-                <div class="card accent-rose">
-                    <div class="card-label">New Debt (Your Share)</div>
-                    <div class="card-value" id="gx-kpi-growth">—</div>
-                    <div class="card-sub" id="gx-kpi-growth-sub">You borrowed an additional...</div>
+                <div class="kpi-row">
+                    <div class="kpi-label">YOUR SHARE</div>
+                    <div class="kpi-value kpi-red" id="gx-kpi-yourcost">—</div>
+                    <div class="kpi-sub" id="gx-kpi-yourcost-sub">Your tax share of this spending</div>
                 </div>
-                <div class="card accent-amber">
-                    <div class="card-label">Your Cost (Operations)</div>
-                    <div class="card-value" id="gx-kpi-yourcost">—</div>
-                    <div class="card-sub" id="gx-kpi-yourcost-sub">Your tax share of this spending</div>
+                <div class="kpi-row">
+                    <div class="kpi-label">NEW DEBT</div>
+                    <div class="kpi-value" id="gx-kpi-newdebt">—</div>
+                    <div class="kpi-sub" id="gx-kpi-newdebt-sub">Total new debt added</div>
                 </div>
-                <div class="card accent-purple">
-                    <div class="card-label">Outstanding Debt Balance</div>
-                    <div class="card-value" id="gx-kpi-debtbal">—</div>
-                    <div class="card-sub" id="gx-kpi-debtbal-sub">Your individual share of Unmatured Debt</div>
+                <div class="kpi-row">
+                    <div class="kpi-label">YOUR SHARE (OF NEW DEBT)</div>
+                    <div class="kpi-value kpi-red" id="gx-kpi-growth">—</div>
+                    <div class="kpi-sub" id="gx-kpi-growth-sub">You borrowed an additional...</div>
+                </div>
+                <div class="kpi-row">
+                    <div class="kpi-label">OUTSTANDING DEBT</div>
+                    <div class="kpi-value" id="gx-kpi-outdebt">—</div>
+                    <div class="kpi-sub" id="gx-kpi-outdebt-sub">Total outstanding debt balance</div>
+                </div>
+                <div class="kpi-row">
+                    <div class="kpi-label">YOUR SHARE (DEBT BALANCE)</div>
+                    <div class="kpi-value kpi-red" id="gx-kpi-debtbal">—</div>
+                    <div class="kpi-sub" id="gx-kpi-debtbal-sub">Your individual share of Unmatured Debt</div>
                 </div>
             </div>
 
             <!-- Chart -->
             <div class="chart-container" style="margin-top:1rem">
                 <div class="chart-header">
-                    <h2 id="gx-chartTitle">Federal Spending Over Time</h2>
+                    <h2 id="gx-chartTitle">FEDERAL SPENDING OVER TIME — CANADA</h2>
                 </div>
                 <div class="chart-empty-state" id="gx-emptyState">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -297,8 +238,100 @@
                 <div class="gx-chart-wrapper chart-wrapper">
                     <canvas id="gx-chart"></canvas>
                 </div>
+                <div class="chart-source">T1 Final Statistics (2023) | Population: Statistics Canada</div>
             </div>
 
+        </div>
+    </section>
+
+    <!-- ═══════ SECTION 3: PENSION EARNINGS ═══════ -->
+    <section class="page-section" id="section-benefits">
+        <div class="section-heading-bar">
+            <div class="section-content-inner">
+                <h2 class="section-title"><span class="section-icon">🏥</span> PENSION EARNINGS</h2>
+            </div>
+        </div>
+        <div class="section-content">
+            <div
+                style="margin-bottom: 24px; padding: 14px 18px; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: var(--radius-sm); border-left: 4px solid var(--accent-blue);">
+                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin: 0;">
+                    <strong style="color: var(--text-primary);">T1 Pension Incomes (CRA Data):</strong> This section
+                    displays T1 pension incomes per CRA data files. Certain values may be estimated and do not reflect
+                    all individual scenarios.
+                </p>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="summary-cards">
+                <div class="card accent-cyan">
+                    <div class="card-label">Total Pension &amp; Benefit Pool</div>
+                    <div class="card-value" id="ben-pool">&mdash;</div>
+                    <div class="card-sub">Combined $ for all benefit types</div>
+                </div>
+                <div class="card accent-amber">
+                    <div class="card-label">% of Taxable Income</div>
+                    <div class="card-value" id="ben-pct">&mdash;</div>
+                    <div class="card-sub" id="ben-pct-sub">&mdash;</div>
+                </div>
+                <div class="card accent-emerald">
+                    <div class="card-label">Total Recipients</div>
+                    <div class="card-value" id="ben-recipients">&mdash;</div>
+                    <div class="card-sub">Across all benefit types</div>
+                </div>
+                <div class="card accent-rose">
+                    <div class="card-label">Per-Recipient Average</div>
+                    <div class="card-value" id="ben-avg">&mdash;</div>
+                    <div class="card-sub">Pool ÷ Recipients</div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="charts-grid charts-single">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>PENSION &amp; BENEFIT AMOUNTS — CANADA</h2>
+                    </div>
+                    <div class="chart-wrapper active">
+                        <canvas id="benefits-chart"></canvas>
+                    </div>
+                    <div class="chart-source">T1 Final Statistics (2023) | Population: Statistics Canada</div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>NUMBER OF RECIPIENTS — CANADA</h2>
+                    </div>
+                    <div class="chart-wrapper active">
+                        <canvas id="recipients-chart"></canvas>
+                    </div>
+                    <div class="chart-source">T1 Final Statistics (2023) | Population: Statistics Canada</div>
+                </div>
+            </div>
+
+            <!-- Benefits Table -->
+            <div class="data-table-container">
+                <div class="chart-header">
+                    <h2>Pension &amp; Benefit Breakdown</h2>
+                </div>
+                <div class="data-table-scroll" id="benefits-table"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ SECTION 4: ADDITIONAL DETAILS ═══════ -->
+    <section class="page-section" id="section-details">
+        <div class="section-heading-bar">
+            <div class="section-content-inner">
+                <h2 class="section-title"><span class="section-icon">📋</span> ADDITIONAL DETAILS</h2>
+            </div>
+        </div>
+        <div class="section-content">
+            <!-- Tax Data by Bracket Table -->
+            <div class="data-table-container">
+                <div class="chart-header">
+                    <h2>Tax Data by Bracket — Canada</h2>
+                </div>
+                <div class="data-table-scroll" id="bracket-table"></div>
+            </div>
         </div>
     </section>
 
