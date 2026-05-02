@@ -45,18 +45,14 @@ function gxInit() {
 }
 
 // ── Bracket Selector ──────────────────────────────────────
-// Note: bracket selector sync is handled by app.js populateBracketSelectors().
-// gxBuildBracketSelector just sets the default value and computes share.
+// app.js populates both selectors and wires them together.
+// Here we just read the current value (already set by app.js) and compute share.
 function gxBuildBracketSelector() {
     var sel = document.getElementById('gx-bracketSelect');
     if (!sel || !window.DATA || !window.DATA.bracketLabels) return;
-    var midIdx = Math.floor(window.DATA.bracketLabels.length / 2);
-    gx.selectedBracket = window.DATA.bracketLabels[midIdx];
+    // Use whatever app.js already selected (window.selectedBracket)
+    gx.selectedBracket = window.selectedBracket || sel.value || window.DATA.bracketLabels[0];
     sel.value = gx.selectedBracket;
-    // also sync the main bracket selector
-    var s1 = document.getElementById('bracketSelect');
-    if (s1) { s1.value = gx.selectedBracket; }
-    if (window.selectedBracket !== undefined) window.selectedBracket = gx.selectedBracket;
     gxComputeShareOfPool();
 }
 
@@ -489,23 +485,26 @@ function gxUpdateCards() {
     }
 }
 
-// ── Lazy init on first view ───────────────────────────────
+// ── Lazy init: wait for DATA from app.js ─────────────────
 var gxInitialized = false;
+
+function gxTryInit() {
+    if (gxInitialized) return;
+    if (typeof GOVEXP_DATA === 'undefined') return;
+    if (!window.DATA) return;
+    gxInitialized = true;
+    gxInit();
+}
+
+document.addEventListener('t1-data-ready', gxTryInit);
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Since we're now a page section (always visible), init immediately after a tick
-    // to let app.js (DATA) finish loading first.
-    // We listen for a custom event fired when DATA is ready.
-    document.addEventListener('t1-data-ready', function() {
-        if (!gxInitialized) {
-            gxInitialized = true;
-            gxInit();
-        }
-    });
-    // Fallback: try after 1.5s in case event already fired
-    setTimeout(function() {
-        if (!gxInitialized && typeof GOVEXP_DATA !== 'undefined') {
-            gxInitialized = true;
-            gxInit();
-        }
-    }, 1500);
+    // Try immediately (data may already be available in local file context)
+    gxTryInit();
+    // Also poll briefly as a fallback
+    var attempts = 0;
+    var poll = setInterval(function() {
+        gxTryInit();
+        if (gxInitialized || ++attempts > 20) clearInterval(poll);
+    }, 300);
 });

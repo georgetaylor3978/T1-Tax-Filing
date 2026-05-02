@@ -23,20 +23,23 @@ var BRACKET_COLORS = [
     '#0891b2','#0e7490','#10b981','#f59e0b','#f43f5e'
 ];
 
-// ── Dark/Light mode toggle ──────────────────────────────────
+// ── Dark/Light mode toggle ──────────────────────────
 (function() {
-    var btn = document.getElementById('themeToggle');
-    if (!btn) return;
     var saved = localStorage.getItem('t1-theme') || 'dark';
     document.documentElement.setAttribute('data-theme', saved);
-    btn.addEventListener('click', function() {
-        var cur = document.documentElement.getAttribute('data-theme');
-        var next = cur === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('t1-theme', next);
-        // Redraw charts with new colors
-        if (DATA) { updateTab1(); updateTab2(); }
-        if (typeof gxUpdateChart === 'function') gxUpdateChart();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('themeToggle');
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+            var cur  = document.documentElement.getAttribute('data-theme');
+            var next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('t1-theme', next);
+            // Redraw charts
+            if (window.DATA) { updateTab1(); updateTab2(); }
+            if (typeof gxUpdateChart === 'function' && typeof gx !== 'undefined' && gx.data) gxUpdateChart();
+        });
     });
 })();
 
